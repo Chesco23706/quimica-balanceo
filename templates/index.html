@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Balanceador de ecuaciones químicas</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="workspace">
+      <div class="intro">
+        <p class="eyebrow">Álgebra matricial exacta</p>
+        <h1>Balanceador de ecuaciones químicas</h1>
+      </div>
+
+      <form id="balance-form" class="equation-panel">
+        <label for="equation">Ecuación química</label>
+        <div class="input-row">
+          <input id="equation" name="equation" value="H2 + O2 -> H2O" autocomplete="off" spellcheck="false">
+          <button type="submit">Balancear</button>
+        </div>
+        <div class="examples" aria-label="Ejemplos">
+          <button type="button" data-example="H2 + O2 -> H2O">H2 + O2</button>
+          <button type="button" data-example="Fe + O2 -> Fe2O3">Fe + O2</button>
+          <button type="button" data-example="C3H8 + O2 -> CO2 + H2O">Propano</button>
+          <button type="button" data-example="KMnO4 + HCl -> KCl + MnCl2 + H2O + Cl2">KMnO4</button>
+        </div>
+      </form>
+
+      <div id="error" class="error hidden"></div>
+      <section id="result" class="result hidden"></section>
+    </section>
+
+    <aside class="side-panel">
+      <div class="theme-row">
+        <span>Modo oscuro</span>
+        <label class="switch">
+          <input id="theme-toggle" type="checkbox">
+          <span></span>
+        </label>
+      </div>
+      <h2>Historial</h2>
+      <div id="history" class="history"></div>
+      <button id="export-btn" class="ghost" type="button" disabled>Exportar resultado</button>
+    </aside>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
