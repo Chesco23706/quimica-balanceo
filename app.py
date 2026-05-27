@@ -5,7 +5,7 @@ quimica y algebra vive en el paquete ``chem_balancer`` para mantener el codigo
 modular y facil de ampliar.
 """
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 
 from chem_balancer.balancer import BalanceError, balance_equation
 
@@ -17,6 +17,12 @@ app = Flask(__name__)
 def index():
     """Muestra la interfaz principal."""
     return render_template("index.html")
+
+
+@app.get("/favicon.ico")
+def favicon():
+    """Redirige la solicitud estandar del navegador al favicon PNG."""
+    return redirect(url_for("static", filename="favicon.png"))
 
 
 @app.post("/api/balance")
