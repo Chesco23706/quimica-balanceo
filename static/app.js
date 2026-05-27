@@ -9,8 +9,9 @@ const themeToggle = document.querySelector("#theme-toggle");
 let lastResult = null;
 let history = JSON.parse(localStorage.getItem("equation-history") || "[]");
 
-renderHistory();
 restoreTheme();
+renderHistory();
+balance(input.value.trim());
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -26,7 +27,7 @@ document.querySelectorAll("[data-example]").forEach((button) => {
 
 themeToggle.addEventListener("change", () => {
   document.body.classList.toggle("dark", themeToggle.checked);
-  localStorage.setItem("dark-theme", themeToggle.checked ? "1" : "0");
+  localStorage.setItem("dark-theme-v2", themeToggle.checked ? "1" : "0");
 });
 
 exportBtn.addEventListener("click", () => {
@@ -68,15 +69,13 @@ async function balance(equation) {
 function renderResult(data) {
   const sections = [
     finalSection(data),
-    listSection("1. Ecuación original", [data.original]),
     splitSection(data),
-    listSection("3. Elementos detectados", data.elements),
+    listSection("Elementos detectados", data.elements),
     atomCountSection(data),
-    listSection("5. Asignación de variables", [data.variable_equation]),
+    listSection("Asignacion de variables", [data.variable_equation]),
     equationsSection(data),
-    matrixSection("7. Conversión del sistema a matriz", data.matrix),
+    matrixSection("Matriz del sistema", data.matrix),
     resolutionSection(data),
-    coefficientsSection(data),
     verificationSection(data),
   ];
 
@@ -85,10 +84,24 @@ function renderResult(data) {
 }
 
 function finalSection(data) {
+  const coefficients = Object.entries(data.coefficients)
+    .map(([variable, value]) => `<span>${escapeHtml(variable)} = ${value}</span>`)
+    .join("");
+
   return `
     <article class="step balanced">
-      <h3>11. Ecuación balanceada final</h3>
-      <p class="final-equation">${escapeHtml(data.balanced_equation)}</p>
+      <h3>Ecuacion Balanceada</h3>
+      <p class="final-equation">${chemHtml(data.balanced_equation)}</p>
+      <div class="solution-grid">
+        <div>
+          <h3>Solucion Matricial Exacta</h3>
+          ${matrixMarkup(data.matrix)}
+        </div>
+        <div>
+          <p>Coeficientes minimos enteros</p>
+          <div class="coefficient-line">${coefficients}</div>
+        </div>
+      </div>
     </article>
   `;
 }
@@ -96,7 +109,7 @@ function finalSection(data) {
 function splitSection(data) {
   return `
     <article class="step">
-      <h3>2. Separación de reactivos y productos</h3>
+      <h3>Reactivos y productos</h3>
       <div class="verification-grid">
         <div class="verify-card"><strong>Reactivos</strong><ul>${data.reactants.map(item).join("")}</ul></div>
         <div class="verify-card"><strong>Productos</strong><ul>${data.products.map(item).join("")}</ul></div>
@@ -109,11 +122,11 @@ function atomCountSection(data) {
   const compounds = [...data.reactants, ...data.products];
   return `
     <article class="step">
-      <h3>4. Conteo de átomos por compuesto</h3>
+      <h3>Conteo de atomos por compuesto</h3>
       <div class="compound-grid">
         ${compounds.map((compound) => `
           <div class="compound">
-            <strong>${escapeHtml(compound)}</strong>
+            <strong>${chemHtml(compound)}</strong>
             ${Object.entries(data.atom_counts[compound]).map(([element, amount]) => `<div>${escapeHtml(element)} = ${amount}</div>`).join("")}
           </div>
         `).join("")}
@@ -125,7 +138,7 @@ function atomCountSection(data) {
 function equationsSection(data) {
   return `
     <article class="step">
-      <h3>6. Construcción del sistema de ecuaciones</h3>
+      <h3>Sistema de ecuaciones</h3>
       <ul>${data.linear_equations.map((entry) => item(`Para ${entry.element}: ${entry.equation}`)).join("")}</ul>
     </article>
   `;
@@ -134,25 +147,14 @@ function equationsSection(data) {
 function resolutionSection(data) {
   return `
     <article class="step">
-      <h3>8. Resolución paso a paso del sistema</h3>
-      <p>Se reduce la matriz con operaciones elementales de fila:</p>
+      <h3>Resolucion paso a paso</h3>
+      <p>Reduccion por operaciones elementales de fila:</p>
       <ol>${data.row_steps.map(item).join("")}</ol>
       ${matrixMarkup(data.rref)}
-      <p>Después se obtiene un vector del espacio nulo:</p>
+      <p>Obtencion del vector del espacio nulo:</p>
       <ol>${data.substitutions.map(item).join("")}</ol>
-      <p>Solución fraccionaria: (${data.fraction_solution.map(escapeHtml).join(", ")}).</p>
-      <p>Se multiplica por m.c.m. de denominadores = ${data.lcm} y se divide por m.c.d. = ${data.gcd} para obtener enteros mínimos.</p>
-    </article>
-  `;
-}
-
-function coefficientsSection(data) {
-  return `
-    <article class="step">
-      <h3>9. Coeficientes encontrados</h3>
-      <div class="chips">
-        ${Object.entries(data.coefficients).map(([variable, value]) => `<span class="chip">${escapeHtml(variable)} = ${value}</span>`).join("")}
-      </div>
+      <p>Solucion fraccionaria: (${data.fraction_solution.map(escapeHtml).join(", ")}).</p>
+      <p>m.c.m. de denominadores = ${data.lcm}; m.c.d. = ${data.gcd}.</p>
     </article>
   `;
 }
@@ -160,7 +162,7 @@ function coefficientsSection(data) {
 function verificationSection(data) {
   return `
     <article class="step">
-      <h3>10. Verificación final</h3>
+      <h3>Verificacion final</h3>
       <div class="verification-grid">
         <div class="verify-card"><strong>Reactivos</strong>${totals(data.verification.reactants)}</div>
         <div class="verify-card"><strong>Productos</strong>${totals(data.verification.products)}</div>
@@ -204,19 +206,25 @@ function saveHistory(equation) {
 
 function renderHistory() {
   historyBox.innerHTML = history.length
-    ? history.map((entry) => `<button type="button">${escapeHtml(entry)}</button>`).join("")
-    : "<p>No hay ecuaciones todavía.</p>";
+    ? history.map((entry) => `
+        <button type="button" data-equation="${escapeHtml(entry)}">
+          <span>${chemHtml(entry)}</span>
+          <span class="history-actions" aria-hidden="true"><span class="eye-icon"></span><span class="doc-icon"></span></span>
+        </button>
+      `).join("")
+    : "<p>No hay ecuaciones todavia.</p>";
 
   historyBox.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
-      input.value = button.textContent;
+      input.value = button.dataset.equation;
       balance(input.value);
     });
   });
 }
 
 function restoreTheme() {
-  const enabled = localStorage.getItem("dark-theme") === "1";
+  const saved = localStorage.getItem("dark-theme-v2");
+  const enabled = saved === null ? true : saved === "1";
   themeToggle.checked = enabled;
   document.body.classList.toggle("dark", enabled);
 }
@@ -240,6 +248,21 @@ function buildExportText(data) {
     "Coeficientes:",
     ...Object.entries(data.coefficients).map(([variable, value]) => `${variable} = ${value}`),
   ].join("\n");
+}
+
+function chemHtml(value) {
+  const text = escapeHtml(value).replaceAll("-&gt;", "&rarr;");
+  let output = "";
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const previous = text[index - 1] || "";
+    if (/\d/.test(char) && /[A-Za-z)]/.test(previous)) {
+      output += `<sub>${char}</sub>`;
+    } else {
+      output += char;
+    }
+  }
+  return output;
 }
 
 function escapeHtml(value) {

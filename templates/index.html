@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Balanceador de ecuaciones químicas</title>
+  <title>Balanceador de ecuaciones quimicas</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
@@ -12,21 +12,28 @@
   <main class="app-shell">
     <section class="workspace">
       <div class="intro">
-        <p class="eyebrow">Álgebra matricial exacta</p>
-        <h1>Balanceador de ecuaciones químicas</h1>
+        <div class="matrix-mark" aria-hidden="true">
+          <span>[</span>
+          <strong>1&nbsp;2&nbsp;3<br>0&nbsp;1&nbsp;0<br>0&nbsp;0&nbsp;1</strong>
+          <span>]</span>
+        </div>
+        <div>
+          <p class="eyebrow">Algebra matricial exacta</p>
+          <h1>Balanceador de ecuaciones quimicas</h1>
+        </div>
       </div>
 
       <form id="balance-form" class="equation-panel">
-        <label for="equation">Ecuación química</label>
+        <label for="equation">Ecuacion quimica</label>
         <div class="input-row">
-          <input id="equation" name="equation" value="H2 + O2 -> H2O" autocomplete="off" spellcheck="false">
-          <button type="submit">Balancear</button>
+          <input id="equation" name="equation" value="H2 + O2 -> H2O" placeholder="Escribe tu ecuacion (ej. H2 + O2 -> H2O)" autocomplete="off" spellcheck="false">
+          <button type="submit"><span aria-hidden="true">+</span>Balancear</button>
         </div>
         <div class="examples" aria-label="Ejemplos">
-          <button type="button" data-example="H2 + O2 -> H2O">H2 + O2</button>
-          <button type="button" data-example="Fe + O2 -> Fe2O3">Fe + O2</button>
-          <button type="button" data-example="C3H8 + O2 -> CO2 + H2O">Propano</button>
-          <button type="button" data-example="KMnO4 + HCl -> KCl + MnCl2 + H2O + Cl2">KMnO4</button>
+          <button type="button" data-example="H2 + O2 -> H2O"><span>H</span>H2 + O2</button>
+          <button type="button" data-example="Fe + O2 -> Fe2O3"><span>Fe</span>Fe + O2</button>
+          <button type="button" data-example="C3H8 + O2 -> CO2 + H2O"><span>C</span>C3H8</button>
+          <button type="button" data-example="KMnO4 + HCl -> KCl + MnCl2 + H2O + Cl2"><span>K</span>KMnO4</button>
         </div>
       </form>
 
@@ -35,6 +42,7 @@
     </section>
 
     <aside class="side-panel">
+      <img class="side-logo" src="{{ url_for('static', filename='favicon.png') }}" alt="">
       <div class="theme-row">
         <span>Modo oscuro</span>
         <label class="switch">
@@ -44,7 +52,7 @@
       </div>
       <h2>Historial</h2>
       <div id="history" class="history"></div>
-      <button id="export-btn" class="ghost" type="button" disabled>Exportar resultado</button>
+      <button id="export-btn" class="ghost" type="button" disabled>Exportar resultados</button>
     </aside>
   </main>
 
