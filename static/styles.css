@@ -90,7 +90,7 @@ input {
   display: flex;
   align-items: center;
   gap: 26px;
-  min-height: 150px;
+  min-height: 132px;
   padding: 6px 4px 26px;
 }
 
@@ -113,15 +113,6 @@ input {
   font-family: "Cascadia Code", Consolas, monospace;
   font-size: clamp(1.1rem, 2.4vw, 1.75rem);
   line-height: 1.18;
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  color: var(--primary);
-  font-size: clamp(1rem, 2.4vw, 1.75rem);
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
 }
 
 h1,
